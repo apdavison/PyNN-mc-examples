@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from neuroml import Morphology as NMLMorphology, Segment, Point3DWithDiam as P
 from pyNN.parameters import IonicSpecies
-from pyNN.morphology import NeuroMLMorphology, uniform
+from pyNN.morphology import NeuroMLMorphology
 from pyNN.utility import get_simulator
 
 
@@ -44,7 +44,7 @@ cell_type = cell_class(
     na={"conductance_density": 0.120},
     kdr={"conductance_density": 0.036},
     pas={
-        "conductance_density": uniform('soma', 0.0003),
+        "conductance_density": sim.morphology.uniform('soma', 0.0003),
         "e_rev": -54.3
     }
 )
@@ -54,7 +54,7 @@ cells = sim.Population(1, cell_type, initial_values={"v": -40})
 stim = sim.DCSource(start=10, stop=12, amplitude=0.8)
 stim.inject_into(cells, location="soma")
 
-cells.record("v", locations={"soma": "soma"}, sampling_interval=0.1)
+cells.record("v", locations="soma", sampling_interval=0.1)
 cells.record("spikes")
 
 sim.run(30)

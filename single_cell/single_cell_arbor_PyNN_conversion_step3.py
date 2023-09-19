@@ -49,7 +49,7 @@ cells = sim.Population(1, cell_type, initial_values={"v": -40})
 stim = sim.DCSource(start=10, stop=12, amplitude=0.8)
 stim.inject_into(cells, location="soma")
 
-cells.record("v", locations={"soma": "soma"})
+cells.record("v", locations="soma")
 
 
 # (4) Define a recipe for a single cell and set of probes upon it.
