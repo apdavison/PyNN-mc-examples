@@ -4,7 +4,8 @@ from math import sqrt
 import numpy as np
 import neo
 import quantities as pq
-from neuroml import Morphology as NMLMorphology, Segment, Point3DWithDiam as P
+from neuroml import Morphology as NMLMorphology, Segment, SegmentGroup, Point3DWithDiam as P
+from morphio import SectionType
 from pyNN.parameters import IonicSpecies
 from pyNN.morphology import NeuroMLMorphology
 from pyNN.utility import get_simulator
@@ -20,7 +21,8 @@ class TwoBranchNeuron(sim.MultiCompartmentNeuron):
     ion_channels = {
         'na': sim.NaChannel,
         'kdr': sim.KdrChannel,
-        'pas': sim.PassiveLeak
+        'pas': sim.PassiveLeak,
+        'leak': sim.PassiveLeakHH
     }
     post_synaptic_entities = {
         'syn': sim.CondExpPostSynapticResponse
@@ -32,18 +34,27 @@ soma = Segment(proximal=P(x=-12, y=0, z=0, diameter=12),
 dend = [
     Segment(proximal=P(x=0, y=0, z=0, diameter=4),
             distal=P(x=50, y=0, z=0, diameter=4),
+            neuro_lex_id="http://uri.neuinfo.org/nif/nifstd/sao273773228",
             name="b0", id=1, parent=soma),
     Segment(proximal=P(x=50, y=0, z=0, diameter=4),
             distal=P(x=50 + 50 / sqrt(2), y=50 / sqrt(2), z=0, diameter=1),
+            neuro_lex_id="http://uri.neuinfo.org/nif/nifstd/sao273773228",
             name="b1", id=2),
     Segment(proximal=P(x=50, y=0, z=0, diameter=2),
             distal=P(x=50 + 50 / sqrt(2), y=-50 / sqrt(2), z=0, diameter=2),
+            neuro_lex_id="http://uri.neuinfo.org/nif/nifstd/sao273773228",
             name="b2", id=3)
 ]
 dend[1].parent = dend[0]
-dend[2].parent = dend[1]
+dend[2].parent = dend[0]
 
-morphology = NeuroMLMorphology(NMLMorphology(segments=[soma] + dend))
+morphology = NeuroMLMorphology(NMLMorphology(
+    segments=[soma] + dend,
+    segment_groups = [
+        SegmentGroup(id=SectionType.soma, members=[soma]),
+        SegmentGroup(id=SectionType.apical_dendrite, members=dend)
+    ]
+))
 
 cell_type = TwoBranchNeuron(
     morphology=morphology,
@@ -55,11 +66,13 @@ cell_type = TwoBranchNeuron(
     Ra=35.4,
     na={"conductance_density": m.uniform("soma", 0.120)},
     kdr={"conductance_density": m.uniform("soma", 0.036)},
+    leak={
+       "conductance_density":  m.uniform("soma", 0.0003),
+       "e_rev": -54.3
+    },
     pas={
-        #"conductance_density": 0.0003,
-        #"e_rev": -54.3
         "conductance_density": m.uniform(m.dendrites(), 0.001),
-        "e_rev": m.uniform(m.dendrites(), -70)
+        "e_rev": -70
     },
     syn={
         "e_syn": 0.0,
@@ -114,7 +127,7 @@ data = cells.get_data().segments[0]
 spikes = data.spiketrains
 
 if len(spikes) > 0:
-    print("{} spikes:".format(len(spikes)))
+    print("{} spikes:".format(spikes.multiplexed[1].size))
     for t in spikes.multiplexed[1]:
         print("{:3.3f}".format(t))
 else:

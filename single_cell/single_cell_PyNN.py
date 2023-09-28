@@ -64,7 +64,7 @@ vm = data.analogsignals[0]
 spikes = data.spiketrains
 
 if len(spikes) > 0:
-    print("{} spikes:".format(len(spikes)))
+    print("{} spikes:".format(spikes.multiplexed[1].size))
     for t in spikes.multiplexed[1]:
         print("{:3.3f}".format(t))
 else:
