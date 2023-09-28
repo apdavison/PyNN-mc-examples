@@ -27,7 +27,14 @@ python ring_network_PyNN.py arbor
 python ring_network_PyNN.py neuron
 
 cd ..
-open single_cell/results/single_cell_PyNN_arbor.png single_cell/results/single_cell_PyNN_neuron.png
-open single_cell_cable/results/single_cell_cable_PyNN_arbor.png single_cell_cable/results/single_cell_cable_PyNN_neuron.png
-open two_cells/results/two_cells_PyNN_arbor.png two_cells/results/two_cells_PyNN_neuron.png
-open ring_network/results/ring_network_PyNN_arbor.png ring_network/results/ring_network_PyNN_neuron.png
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    open single_cell/results/single_cell_PyNN_arbor.png single_cell/results/single_cell_PyNN_neuron.png
+    open single_cell_cable/results/single_cell_cable_PyNN_arbor.png single_cell_cable/results/single_cell_cable_PyNN_neuron.png
+    open two_cells/results/two_cells_PyNN_arbor.png two_cells/results/two_cells_PyNN_neuron.png
+    open ring_network/results/ring_network_PyNN_arbor.png ring_network/results/ring_network_PyNN_neuron.png
+else
+    xdg-open single_cell/results/single_cell_PyNN_arbor.png single_cell/results/single_cell_PyNN_neuron.png
+    xdg-open single_cell_cable/results/single_cell_cable_PyNN_arbor.png single_cell_cable/results/single_cell_cable_PyNN_neuron.png
+    xdg-open two_cells/results/two_cells_PyNN_arbor.png two_cells/results/two_cells_PyNN_neuron.png
+    xdg-open ring_network/results/ring_network_PyNN_arbor.png ring_network/results/ring_network_PyNN_neuron.png
+fi
